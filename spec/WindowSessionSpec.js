@@ -12,6 +12,13 @@ describe("WindowSession", function() {
     expect(windowSession.getItem('name')).toEqual('zhangshan');
   });
 
+  it("should be able to play a Song", function() {
+    var windowSession = new WindowSession('1212');
+    windowSession.setItem('name', 'zhangshan');
+
+    expect(windowSession.getItem('name')).toEqual('zhangshan');
+  });
+
   // describe("when song has been paused", function() {
   //   beforeEach(function() {
   //     player.play(song);

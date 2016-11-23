@@ -1,0 +1,34 @@
+{
+  "name": "windowsession",
+  "version": "1.0.0",
+  "description": "浏览器页面之间数据传递以及事件监听调用",
+  "main": "index.js",
+  "dependencies": {
+    "karma": "^1.3.0"
+  },
+  "devDependencies": {
+    "jasmine-core": "^2.5.2",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-ie-launcher": "^1.0.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-safari-launcher": "^1.0.0"
+  },
+  "scripts": {
+    "test": "karma start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangsaipp/WindowSession.git"
+  },
+  "keywords": [
+    "window",
+    "session"
+  ],
+  "author": "yangsai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yangsaipp/WindowSession/issues"
+  },
+  "homepage": "https://github.com/yangsaipp/WindowSession#readme"
+}
