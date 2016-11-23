@@ -1,43 +1,41 @@
 describe("WindowSession", function() {
-  // var WindowSession = require('../src/WindowSession');
+  var rootWindow = window;
+  var windowSession = getWindowSession();
+  var sessionId = windowSession.getSessionId();
 
   beforeEach(function() {
-    // windowSession = new WindowSession();
+    windowSession.clear();
   });
 
-  it("should be able to play a Song", function() {
-    var windowSession = new WindowSession('1212');
+  it("should be get same WindowSession object when sessionId is same", function() {
+    expect(getWindowSession(sessionId)).toEqual(windowSession);
+  });
+
+  it("should be get right item vaule after set item", function() {
     windowSession.setItem('name', 'zhangshan');
-
     expect(windowSession.getItem('name')).toEqual('zhangshan');
+    expect(windowSession.getItem('name2')).toBeUndefined();
   });
 
-  it("should be able to play a Song", function() {
-    var windowSession = new WindowSession('1212');
-    windowSession.setItem('name', 'zhangshan');
+  describe("that had set some item", function() {
+    beforeEach(function() {
+      windowSession.setItem('name', 'zhangshan');
+      expect(windowSession.getItem('name')).toEqual('zhangshan');
+    });
 
-    expect(windowSession.getItem('name')).toEqual('zhangshan');
+    it("should be get item value is undefined after the item remove", function() {
+      windowSession.remove('name');
+      expect(windowSession.getItem('name')).toBeUndefined();
+
+     
+    });
+
+    it("should be get item value is after the windowSession clear", function() {
+      expect(windowSession.getItem('name')).toEqual('zhangshan');
+      windowSession.clear();
+      expect(windowSession.getItem('name')).toBeUndefined();
+    });
   });
-
-  // describe("when song has been paused", function() {
-  //   beforeEach(function() {
-  //     player.play(song);
-  //     player.pause();
-  //   });
-
-  //   it("should indicate that the song is currently paused", function() {
-  //     expect(player.isPlaying).toBeFalsy();
-
-  //     // demonstrates use of 'not' with a custom matcher
-  //     expect(player).not.toBePlaying(song);
-  //   });
-
-  //   it("should be possible to resume", function() {
-  //     player.resume();
-  //     expect(player.isPlaying).toBeTruthy();
-  //     expect(player.currentlyPlayingSong).toEqual(song);
-  //   });
-  // });
 
   // demonstrates use of spies to intercept and test method calls
   // it("tells the current song if the user has made it a favorite", function() {
