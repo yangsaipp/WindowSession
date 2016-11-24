@@ -4,15 +4,17 @@
 # 环境搭建
 
 
-安装karma-cli 
+安装karma-cli  
 ```
 npm install -g karma-cli 
 ```
-安装npm
+
+安装npm相关依赖  
 ```
 npm install
 ```
-运行测试
+
+运行测试  
 ```
-karma start
+npm test
 ```
