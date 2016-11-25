@@ -58,3 +58,21 @@ describe("WindowSession", function() {
   //   });
   // });
 });
+
+
+//demonstrates use of expected exceptions
+// describe("multiple iframe", function() {
+//   var rootWindow = window;
+//   var windowSession = getWindowSession();
+//   var sessionId = windowSession.getSessionId();
+//   var openWindow = window.open('spec/openerSpec.html', 'openerSpec');
+
+//   beforeEach(function() {
+//     windowSession.clear();
+    
+//   });
+
+//   it("should be get same WindowSession object when sessionId is same", function() {
+//     expect(openWindow.getWindowSession(sessionId)).toEqual(windowSession);
+//   });
+// });
