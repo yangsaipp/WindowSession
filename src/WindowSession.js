@@ -23,7 +23,7 @@
 		var currentWin = win;
 		var childWin = null;
 		do {
-			if(currentWin[getVariableName(sessionId)] instanceof WindowSession) {
+			if(Object.prototype.toString.call(currentWin[getVariableName(sessionId)]) === '[object Object]') {
 				return currentWin[getVariableName(sessionId)];
 			} else {
 				childWin = currentWin;
@@ -70,7 +70,7 @@
 	 * @return {string} WindowSession对象存放在window对象下的变量名
 	 */
 	function getVariableName(sessionId) {
-		return 'window-seesion-' + sessionId
+		return 'window_seesion_' + sessionId;
 	}
 
 	WindowSession.prototype = {
@@ -96,9 +96,11 @@
          * 设置对应键值对到session
          * @param key
          * @param value
+         * @returns value
          */
 		setItem: function (key, value) {
 			this._data[key] = value;
+			return this.getItem(key);
 		},
 
         /**
@@ -144,7 +146,7 @@
 		 * @return {function}          Returns a deregistration function for this listener.
 		 */
 		on: function (name, listener) {
-			return this._registry.on(name, listener);
+			return this._listenerRegistry.on(name, listener);
 		},
 
 		/**
@@ -155,7 +157,7 @@
 		 * @return {Object}      Event object 
 		 */
 		emit: function (name, arg) {
-			return this._registry.emit(name, arg);
+			return this._listenerRegistry.emit.apply(this._listenerRegistry, arguments);
 		}
 	};
 
@@ -214,8 +216,16 @@
 		 * @param  {*} arg  Optional one or more arguments which will be passed onto the event listeners.
 		 * @return {Object}      Event object 
 		 */
-		emit: function (name, arg) {
-			
+		emit: function () {
+			var args = Array.prototype.slice.call(arguments);
+			var listeners = this._getListeners(args.shift());
+			var event = {targetWin: window};
+			if(listeners) {
+				for (var i = 0; i < listeners.length; i++) {
+					listeners[i].listener.apply(listeners[i].registWin, args);
+				}
+				return event;
+			}
 		}
 	};
 

@@ -9,6 +9,11 @@
 npm install -g karma-cli 
 ```
 
+安装anywhere启动静态服务器用于模仿iframe环境
+```
+npm install -g anywhere
+```
+
 安装npm相关依赖  
 ```
 npm install
