@@ -2,6 +2,7 @@
 
 	/**
 	 * 根据给定的sessionId获取WindowSession对象。
+	 * 该方法对外开放供使用者创建或者获取已经存在的WindowSession对象。
 	 * @param  String sessionId，为null则创建新的WindowSession对象
 	 * @return WindowSession  session对象，可以用于在window之间传递数据和监听发送事件
 	 */
@@ -20,11 +21,17 @@
 	 * @return WindowSession  WindowSession
 	 */
 	function seachSession(sessionId) {
+		// 先从当前窗口获取
+		if(win[getVariableName(sessionId)] instanceof WindowSession) {
+			return win[getVariableName(sessionId)];
+		}
+
+		// 在从父窗口中获取
 		var currentWin = win;
 		var childWin = null;
 		do {
 			if(Object.prototype.toString.call(currentWin[getVariableName(sessionId)]) === '[object Object]') {
-				return currentWin[getVariableName(sessionId)];
+				return new WindowSession(currentWin[getVariableName(sessionId)]);
 			} else {
 				childWin = currentWin;
 				currentWin = currentWin.opener || currentWin.parent;
@@ -55,12 +62,23 @@
 	// 定义WindowSession 对象 //
 	////////////////////////////
 
-	function WindowSession(sessionId) {
-		if(sessionId){
-			this._sessionId = sessionId;
-		}else {
-			this._sessionId = uuid();
-		}
+	/**
+	 * 三种创建WindowSession的方式：
+	 * 1. new WindowSession();  创建新的WindowSession, sessionId将是随机的uuid
+	 * 
+	 * 2. new WindowSession(parentSession); 基于parentSession创建新的WindowSession, 与parentSession共享数据和注册的监听器信息。
+	 * 设计考虑：<br/>
+	 * 基于已经存在的WindowSession对象创建新的对象，主要用于基于父页面的windowSession对象创建子页面的WindowSession对象，
+	 * 若在子窗口中使用父窗口中的windowSession，那么在子页面调用windowSession的on、emit等方法时，其执行环境还是在父窗口，这样就无法记录子窗口的信息，导致一些问题。
+	 * 如下：
+	 * 1、子窗口使用on方法注册监听器后，在其他窗口触发时无法将监听器回调方法的执行环境修改为其注册时的子窗口window对象。
+	 * 2、子窗口使用emit方法无法记录触发事件的窗口信息。
+	 * ...
+	 * 所以采用每个子窗口都使用各自的windowsession对象，而这些对象内部数据是共享的设计方式。
+	 * @param {WindowSession} parentSession 父页面的windowSession对象
+	 */
+	function WindowSession(parentSession) {
+		this._parentSession = parentSession;
 		this._init();
 	}
 
@@ -76,11 +94,17 @@
 	WindowSession.prototype = {
 
 		_init: function () {
-			// 用于存放不同window之间要访问的数据
-			this._data = {};
-			// 用于存放各个window中注册的监听器
-			this._listenerRegistry = new ListenerRegistry();
-
+			if(this._parentSession) {	// 有父windowSession，则使用父windowSession的属性。
+				this._sessionId = this._parentSession.getSessionId();
+				this._data = this._parentSession._data;
+				this._listenerRegistry = this._parentSession._listenerRegistry;
+			} else {
+				this._sessionId =  this._sessionId || uuid();
+				// 用于存放不同window之间要访问的数据
+				this._data = {};
+				// 用于存放各个window中注册的监听器
+				this._listenerRegistry = new ListenerRegistry();
+			}
 			win[getVariableName(this._sessionId)] = this;
 		},
 
@@ -131,6 +155,16 @@
 			this._data = {};
 		},
 
+		equal: function (otherSession) {
+			if(otherSession == null) {
+				return false;
+			}
+
+			return this == otherSession || (this._sessionId === otherSession.getSessionId() && 
+				this._data === otherSession._data && 
+				this._listenerRegistry === otherSession._listenerRegistry);
+		},
+
 		// createPageAttribute : function (key, value) {
 		// 	this.setItem(key, value);
 		// },
@@ -146,7 +180,7 @@
 		 * @return {function}          Returns a deregistration function for this listener.
 		 */
 		on: function (name, listener) {
-			return this._listenerRegistry.on(name, listener);
+			return this._listenerRegistry.on(name, listener, win);
 		},
 
 		/**
@@ -157,6 +191,8 @@
 		 * @return {Object}      Event object 
 		 */
 		emit: function (name, arg) {
+			// 将当前window对象加入参数列表中
+			var args = Array.prototype.push.call(arguments, win);
 			return this._listenerRegistry.emit.apply(this._listenerRegistry, arguments);
 		}
 	};
@@ -190,7 +226,7 @@
 			return this._on(name, listener);
 		},
 
-		_on: function (name, listener)  {
+		_on: function (name, listener, registWin)  {
 			var listeners = this._getListeners(name);
 			if(listeners == null) {
 				listeners = [];
@@ -199,7 +235,7 @@
 			listeners.push({
 				name: name,
 				listener: listener,
-				registWin: window
+				registWin: registWin
 			});
 			this._registry[name] = listeners;
 			return listener;
@@ -218,8 +254,12 @@
 		 */
 		emit: function () {
 			var args = Array.prototype.slice.call(arguments);
+			// 根据name获取对应注册的listeners，并从参数列表中移除name
 			var listeners = this._getListeners(args.shift());
-			var event = {targetWin: window};
+			// 获取触发的窗口对象构建event对象，并从参数列表中移除触发的窗口对象
+			var event = {targetWin: args.pop()};
+			// 参数列表加入event对象
+			args.push(event);
 			if(listeners) {
 				for (var i = 0; i < listeners.length; i++) {
 					listeners[i].listener.apply(listeners[i].registWin, args);

@@ -16,7 +16,7 @@ describe("WindowSession", function() {
     });
 
     it("should be get same WindowSession object when sessionId is same", function() {
-      expect(getWindowSession(sessionId)).toEqual(windowSession);
+      expect(getWindowSession(sessionId)).toEqualSession(windowSession);
     });
 
     it("should be get right item vaule after set item", function() {
@@ -87,7 +87,9 @@ describe("WindowSession", function() {
     });
 
     it("should emit opener listener success", function (done) {
-      expect(windowSession.emit('openerCall', 'root', 0, expect)).not.toBeUndefined();
+      var event = windowSession.emit('openerCall', 'root', 0, expect);
+      expect(event).not.toBeUndefined();
+      expect(event.targetWin).toEqual(window);
       done();
     });
 

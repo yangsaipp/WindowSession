@@ -1,12 +1,11 @@
 beforeEach(function () {
   jasmine.addMatchers({
-    toBePlaying: function () {
+    toEqualSession: function () {
       return {
         compare: function (actual, expected) {
-          var player = actual;
-
+          var windowSession = actual;
           return {
-            pass: player.currentlyPlayingSong === expected && player.isPlaying
+            pass: windowSession.equal(expected)
           };
         }
       };

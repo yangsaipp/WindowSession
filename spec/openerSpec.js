@@ -4,8 +4,9 @@ describe("WindowSession", function() {
   var windowSession = getWindowSession(sessionId);
 
   describe('(self window)', function () {
-    it("should be not null", function() {
+    it("should be equal parent window session", function() {
       expect(windowSession).not.toBeNull();
+      expect(windowSession).toEqualSession(window.opener['window_seesion_'+ sessionId]);
     });
 
     it('should add window item data success', function () {
@@ -15,7 +16,8 @@ describe("WindowSession", function() {
     });
 
     it("应该增加window监听事件成功", function () {
-      expect(windowSession.on('openerCall', function (name, index, expect) {
+      expect(windowSession.on('openerCall', function (name, index, expect, event) {
+        expect(event.targetWin).toEqual(window.opener);
         expect(this).toEqual(window);
         expect(name).toEqual('root');
         expect(index).toEqual(0);
@@ -41,7 +43,9 @@ describe("WindowSession", function() {
     });
 
     it("应该触发父窗口监听的rootWindowCall事件成功", function(done) {
-      expect(windowSession.emit('rootWindowCall','opener', 1, expect)).not.toBeUndefined();
+      var event = windowSession.emit('rootWindowCall','opener', 1, expect);
+      expect(event).not.toBeUndefined();
+      expect(event.targetWin).toEqual(window);
       done();
     });
   });
