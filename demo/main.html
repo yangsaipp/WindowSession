@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>windowsession demo</title>
+  	<script src="../src/WindowSession.js"></script>
+</head>
+<body>
+	<div align="center">
+		<p>
+			data : <input type="text" id="main_data"> <button onclick="setValue()">保存</button>&nbsp;<button onclick="emit()">其他window显示</button>
+		</p>
+		<p>
+			from window : <input type="text" id="window_url" disabled="disabled">
+			data : <input type="text" id="other_window_data" disabled="disabled">
+		</p>
+
+		<p>
+			left data : <input type="text" id="left_data" disabled="disabled"> <button onclick="getValue('left')">get</button>
+			right data : <input type="text" id="right_data" disabled="disabled"><button onclick="getValue('right')">get</button>
+		</p>
+	</div>
+	<div style="float: left;width: 50%;">
+		<iframe style="width: 90%;" id="leftWindow" id="leftWindow" src=""></iframe>
+	</div>
+	<div style="float: right;width: 50%;">
+		<iframe style="width: 90%;" id="rightWindow" src=""></iframe>
+	</div>
+	<script type="text/javascript">
+		(function (win) {
+			var session = win.getWindowSession();
+
+			win.setValue = function () {
+				session.setItem("main_data", document.getElementById("main_data").value);
+			};
+
+			win.getValue = function (location) {
+				var key = location + "_data";
+				document.getElementById(key).value = session.getItem(key);
+			};
+
+			win.emit = function () {
+				session.emit("show_data", document.getElementById("main_data").value);
+			};
+
+			session.on("show_data", function (data, event) {
+				document.getElementById("other_window_data").value = data;
+				document.getElementById("window_url").value = event.targetWin.location.pathname;
+			});
+			document.getElementById("leftWindow").src = 'leftIframe.html?sessionId=' + session.getSessionId();
+			document.getElementById("rightWindow").src = 'rightIframe.html?sessionId=' + session.getSessionId();
+			// win.frames["leftWindow"].document.location.href ='leftIframe.html?sessionId=' + session.getSessionId(); 
+			// win.frames["rightWindow"].document.location.href = 'rightIframe.html?sessionId=' + session.getSessionId();
+		})(window);
+	</script>
+</body>
+</html>

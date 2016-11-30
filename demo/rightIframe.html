@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>windowsession demo</title>
+  	<script src="../src/WindowSession.js"></script>
+</head>
+<body>
+	<div align="center">
+		<p>
+			data : <input type="text" id="right_data"> <button onclick="setValue()">保存</button>&nbsp;<button onclick="emit()">其他window显示</button>
+		</p>
+		<p>
+			from window : <input type="text" id="window_url" disabled="disabled">
+			data : <input type="text" id="other_window_data" disabled="disabled">
+		</p>
+		
+	</div>
+	
+	<script type="text/javascript">
+		(function (win) {
+			// console.log(param("sessionId"));
+			var session = win.getWindowSession(param("sessionId"));
+
+			win.setValue = function () {
+				session.setItem("right_data", document.getElementById("right_data").value);
+			};
+
+			
+
+			win.emit = function () {
+				session.emit("show_data", document.getElementById("right_data").value);
+			};
+
+			session.on("show_data", function (data, event) {
+				document.getElementById("other_window_data").value = data;
+				document.getElementById("window_url").value = event.targetWin.location.pathname;
+			});
+
+			function param(name) {
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+			  	var r = window.location.search.substr(1).match(reg); 
+			  	if (r != null) return unescape(r[2]); 
+			  	return null; 
+			}
+		})(window);
+	</script>
+</body>
+</html>
