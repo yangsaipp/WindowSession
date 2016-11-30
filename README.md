@@ -23,7 +23,7 @@ session.on("say", function(data) {
 });
 
 ```
-- 使用windowsession对象(父或者其他子窗口中)
+- 使用windowsession对象(其他子窗口中)
 ```javascript
 // 得到sessionId
 var sessionId = param('sessionId');
