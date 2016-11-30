@@ -2,8 +2,11 @@
 WindowSession主要用于浏览器window之间数据共享以及事件监听调用。
 
 # 使用说明
-1. 引入WindowSession.js
-2. 顶层的窗口中构建windowsession对象  
+- 引入WindowSession.js
+```javascript
+<script src="../src/WindowSession.js"></script>
+```
+- 构建windowsession对象(顶层的窗口中)
 ```javascript
 // 获取session对象
 var session = window.getWindowSession();
@@ -20,8 +23,7 @@ session.on("say", function(data) {
 });
 
 ```
-3. 其他窗口中使用
-
+- 使用windowsession对象(父或者其他子窗口中)
 ```javascript
 // 得到sessionId
 var sessionId = param('sessionId');
