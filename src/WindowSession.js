@@ -29,12 +29,19 @@
 		// 在从父窗口中获取
 		var currentWin = win;
 		var childWin = null;
+		var deep = 0;
 		do {
 			if(Object.prototype.toString.call(currentWin[getVariableName(sessionId)]) === '[object Object]') {
 				return new WindowSession(currentWin[getVariableName(sessionId)]);
 			} else {
 				childWin = currentWin;
 				currentWin = currentWin.opener || currentWin.parent;
+			}
+			if(deep > 20) {
+				console.debug("查找seesionid:%s所对应的WindowSession对象时遍历深度已超过%s,有可能陷入死循环.", sessionId, deep);
+				return null;
+			}else {
+				deep ++;
 			}
 		}
 		while(currentWin !== null && currentWin != childWin);
