@@ -13,11 +13,14 @@ import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import browserSync from 'browser-sync';
 import rimraf   from 'rimraf';
+import browserify  from 'browserify';
+import babelify    from 'babelify';
+import source      from 'vinyl-source-stream';
 
 const $ = gulpLoadPlugins();
 // const reload = browserSync.reload;
 // 输出目录
-const dist = 'dest';
+const dist = 'dist';
 const PRODUCTION = false;
 
 // build任务：先调用clean，在并行调用javascript、images
@@ -59,12 +62,19 @@ function css() {
 // 合并压缩js
 // 若PRODUCTION为true就混淆js
 function javascript() {
-  return gulp.src("src/**/*.js")
-      .pipe($.sourcemaps.init())
-      .pipe($.babel())
-      // .pipe($.concat('app.js'))
-      .pipe($.if(PRODUCTION, $.uglify().on('error', e => { console.log(e); })))
-      .pipe(gulp.dest(dist + '/js'));
+  // return gulp.src("src/**/*.js")
+  //     .pipe($.sourcemaps.init())
+  //     .pipe($.babel())
+  //     .pipe($.concat('WindowSession.js'))
+  //     .pipe($.if(PRODUCTION, $.uglify().on('error', e => { console.log(e); })))
+  //     .pipe(gulp.dest(dist + '/js'));
+  //     
+  // set up the browserify instance on a task basis
+  return browserify({entries: ['src/WindowSession.js'], debug: true})
+          .transform("babelify", { presets: ["es2015"] })
+          .bundle()
+          .pipe(source('WindowSession.js'))
+          .pipe(gulp.dest(dist + '/js'));
 }
 
 // copy 图片到输出目录，若PRODUCTION则压缩图片
