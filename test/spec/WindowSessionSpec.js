@@ -6,7 +6,7 @@ describe("WindowSession", function() {
 
   
 
-  describe("(base test)", function() {
+  describe("[One Window Test]", function() {
     afterAll(function () {
       windowSession.clear();
     });
@@ -53,53 +53,63 @@ describe("WindowSession", function() {
     });
   });
 
-  describe("(self window) ", function () {
+  describe("[Two Windows Test]", function () {
+    var openWindow;
+    
+    // 开始之前需要开启新的页面来测试不同页面之间的交互
+    beforeAll(function () {
+      var url = 'OpenerSpecRunner.html?sessionId=' + sessionId;
+      setTimeout(function () {
+        console.log("open child window, sessionId:%s.", sessionId);
+        openWindow = openUrl(url);
+      }, 1000);
+      //openWindow = rootWindow.open('OpenerSpecRunner.html?sessionId=' + sessionId, 'OpenerSpecRunner'); 
+    });
 
-    it('should add window listenner success', function () {
-      // 必须要使用传递过来的expect，否则会提示expect无spec，执行失败。
-      expect(windowSession.on('rootWindowCall', function (name, index, expect) {
-        // expect(event.targetWin).toEqual(openWindow);
+    function openUrl(url) {
+      var $open =  $('<iframe style="width: 100%; height: 300px; margin-top:50px;" id="OpenerSpecRunner" src="' + url + '"></iframe>');
+      $('body').append($open);
+      // window.document.getElementById("OpenerSpecRunner").src = url;
+      return window.frames['OpenerSpecRunner'].contentWindow;
+    }
+      
+    it('should add listenner success', function () {
+      expect(windowSession.on('rootWindowCall', function (name, index, expect, event) {
+        // 必须要使用传递过来的expect，否则会提示expect无spec，执行失败。
+        expect(event.targetWin).toEqual(openWindow);
         expect(this).toEqual(rootWindow);
         expect(name).toEqual('opener');
         expect(index).toEqual(1);
       })).not.toBeUndefined();
     });
 
-    it('should add window item data success', function () {
-      // 必须要使用传递过来的expect，否则会提示expect无spec，执行失败。
+    it('should add item data success', function () {
       var itemData = {name:'root',index:0};
       expect(windowSession.setItem('rootWinData', itemData)).toEqual(itemData);
     });
-    
-  });
 
-  describe("(opener window) ", function () {
-    // 开始之前需要开启新的页面来测试不同页面之间的交互
-    beforeAll(function () {
-      console.log("sessionId:%s", sessionId);
-      var openWindow = rootWindow.open('OpenerSpecRunner.html?sessionId=' + sessionId, 'OpenerSpecRunner');
-    });
+    describe("After 2 secs", function () {
+      beforeEach(function (done) {
+        // 4s后在执行
+        setTimeout(function () {
+          done();
+        }, 2000);
+      });
 
-
-    beforeEach(function (done) {
-      setTimeout(function () {
+      it("should be emit child window listener success", function (done) {
+        var event = windowSession.emit('openerCall', 'root', 0, expect);
+        expect(event).not.toBeUndefined();
+        expect(event.targetWin).toEqual(window);
         done();
-      }, 2000);
-    });
+      });
 
-    it("should emit opener listener success", function (done) {
-      var event = windowSession.emit('openerCall', 'root', 0, expect);
-      expect(event).not.toBeUndefined();
-      expect(event.targetWin).toEqual(window);
-      done();
-    });
-
-    it("should get opener item data success", function (done) {
-      var openerWinData = windowSession.getItem('openerWinData');
-      expect(openerWinData).not.toBeNull();
-      expect(openerWinData.name).toEqual('opener');
-      expect(openerWinData.index).toEqual(1);
-      done();
+      it("should get child window item data success", function (done) {
+        var openerWinData = windowSession.getItem('openerWinData');
+        expect(openerWinData).not.toBeNull();
+        expect(openerWinData.name).toEqual('opener');
+        expect(openerWinData.index).toEqual(1);
+        done();
+      });
     });
   });
 
