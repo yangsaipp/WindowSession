@@ -28,7 +28,10 @@ gulp.task('default',
     gulp.series('build'));
 
 gulp.task('dev',
-    gulp.series('build', server, watch));
+    gulp.series('build', devServer, watch));
+
+gulp.task('demo',
+    gulp.series('build', demoServer));
 
 // Reload the browser with BrowserSync
 function reload(done) {
@@ -79,11 +82,23 @@ function copy() {
 }
 
 // Start a server with BrowserSync to preview the site in
-function server(done) {
+function devServer(done) {
   browserSync.init({
     server: {
       baseDir: [dist, "test"],
       index: 'SpecRunner.html'
+    }, 
+    port: 8888
+  });
+  done();
+}
+
+// Start a server with BrowserSync to preview the site in
+function demoServer(done) {
+  browserSync.init({
+    server: {
+      baseDir: [dist, "demo"],
+      index: 'main.html'
     }, 
     port: 8888
   });

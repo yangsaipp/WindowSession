@@ -50,12 +50,17 @@ npm install gulpjs/gulp-cli -g
 npm install
 ```
 
-启动命令（用于开发）
+开发环境启动任务（用于开发）
 ```
 gulp dev
 ```
 
-构建命令（用于输出js文件，以便在自己项目中使用）
+demo环境启动任务（用于启动demo服务展示demo页面）
+```
+gulp demo
+```
+
+构建任务（用于输出js文件，以便在自己项目中使用）
 ```
 gulp build
 ```
