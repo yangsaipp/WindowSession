@@ -40,7 +40,7 @@ session.emit('say', 'hello');
 
 # 环境搭建
 
-安装gulp-cli(由于需要加载iframe故已不使用)  
+安装gulp-cli 
 ```
 npm install gulpjs/gulp-cli -g 
 ```
