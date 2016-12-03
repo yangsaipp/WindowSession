@@ -76,7 +76,8 @@ describe("WindowSession", function() {
   describe("(opener window) ", function () {
     // 开始之前需要开启新的页面来测试不同页面之间的交互
     beforeAll(function () {
-      var openWindow = rootWindow.open('spec/openerSpec.html?sessionId=' + sessionId, 'openerSpec');
+      console.log("sessionId:%s", sessionId);
+      var openWindow = rootWindow.open('OpenerSpecRunner.html?sessionId=' + sessionId, 'OpenerSpecRunner');
     });
 
 

@@ -40,16 +40,6 @@ session.emit('say', 'hello');
 
 # 环境搭建
 
-安装nodejs anywhere插件用于启动静态服务器
-```
-npm install -g anywhere
-```
-
-安装karma-cli(由于需要加载iframe故已不使用)  
-```
-npm install -g karma-cli 
-```
-
 安装gulp-cli(由于需要加载iframe故已不使用)  
 ```
 npm install gulpjs/gulp-cli -g 
@@ -60,7 +50,12 @@ npm install gulpjs/gulp-cli -g
 npm install
 ```
 
-运行测试用例
+启动命令（用于开发）
 ```
-npm test
+gulp dev
+```
+
+构建命令（用于输出js文件，以便在自己项目中使用）
+```
+gulp build
 ```
