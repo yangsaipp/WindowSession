@@ -50,6 +50,11 @@ npm install -g anywhere
 npm install -g karma-cli 
 ```
 
+安装gulp-cli(由于需要加载iframe故已不使用)  
+```
+npm install gulpjs/gulp-cli -g 
+```
+
 安装npm相关依赖  
 ```
 npm install
