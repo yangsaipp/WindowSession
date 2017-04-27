@@ -222,7 +222,7 @@
 		 * @param  {function(event, ...args)} listener Function to call when the event is emitted
 		 * @return {function}          Returns a deregistration function for this listener.
 		 */
-		on: function (name, listener) {
+		on: function (name, listener, registWin) {
 			if(name == null) {
 				throw new Error('注册失败，未指定需要监听的事件名称');
 			}
@@ -230,7 +230,7 @@
 			if(typeof listener !== 'function') {
 				throw new Error('注册失败，事件监听回调方法不是js方法');
 			}
-			return this._on(name, listener);
+			return this._on(name, listener, registWin);
 		},
 
 		_on: function (name, listener, registWin)  {
@@ -269,6 +269,7 @@
 			args.push(event);
 			if(listeners) {
 				for (var i = 0; i < listeners.length; i++) {
+					console.debug("调用%o下的%s方法:%o",listeners[i].registWin.location.href, listeners[i].name, listeners[i].listener);
 					listeners[i].listener.apply(listeners[i].registWin, args);
 				}
 				return event;
